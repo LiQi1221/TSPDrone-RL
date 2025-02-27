@@ -86,6 +86,19 @@ class DataGenerator(object):
                 for k in range(num_nodes_batch):
                     # calculate Euclidean distance.
                     edge_weights[j, k] = torch.sqrt(torch.sum((coord_batch[j] - coord_batch[k]) ** 2))
+            # Parameter checking
+            if self.args["k_value"] is not None:
+                topk = self.args["k_value"]
+                if topk <= 0 or topk > num_nodes_batch:
+                    raise ValueError("k_value must be > 0 and <= number of nodes")
+            elif self.args["distance_threshold"] is not None:
+                distance_threshold = self.args["distance_threshold"]
+                if distance_threshold <= 0:
+                    raise ValueError("distance_threshold must be > 0")
+            else:
+                # Provide default values if the parameters are not set
+                self.args["k_value"] = 5
+                # self.args["distance_threshold"] = 0.1
             # normalize by row
             edge_weights_normalized = np.zeros_like(edge_weights)
             for i in range(edge_weights.shape[0]):
